@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "my_package"
+version = "0.1.0"
+description = "Small code for code analysis"
+authors = ["jiaqi"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+openai = "^0.28.1"
+chardet = "^5.2.0"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.scripts]
+my-script = "my_package.gpt_analysis:start"
+
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
