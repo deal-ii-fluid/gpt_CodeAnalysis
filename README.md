@@ -21,6 +21,19 @@ build \
 --tag gpt_analysis:0.0.1
 ```
 
+## 启动podman image
+```podman machine stop; podman machine start
+```
+If restart doesn't help then try to recreate your podman machine:
+```
+podman machine stop
+podman machine rm
+podman machine init # you may specify parameters for your VM
+podman machine start
+```
+
+
+
 
 ```bash
 podman \
@@ -36,4 +49,5 @@ bash \
 -c \
 "python -c 'from my_package.code_analysis import start; start()'"
 ```
+
 
