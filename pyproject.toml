@@ -1,18 +1,48 @@
 [tool.poetry]
-name = "my_package"
-version = "0.1.0"
-description = "Small code for code analysis"
-authors = ["jiaqi"]
+name = "codegpt"
+version = "0.3.1"
+license = "GPL-3.0-or-later"
+description = "A CLI tool for developers using GPT-3."
+authors = ["John Partee"]
+repository = "https://github.com/morganpartee/codegpt"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
+typer = "^0.4.0"
+python-magic = "^0.4.27"
+rich = "^12.6.0"
 openai = "^0.28.1"
-chardet = "^5.2.0"
-python-dotenv = "^1.0.0"
+pygments = "^2.16.1"
+fparser = "^0.1.3"
+astunparse = "^1.6.3"
 
-[tool.poetry.scripts]
-my-script = "my_package.gpt_analysis:start"
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"
 
 [build-system]
-requires = ["poetry_core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry.scripts]
+codegpt = "codegpt.main:app"
+
+[tool.pytest]
+addopts = "--capture=fd --cov=my_module"
+
+# Directory where cache files should be stored
+cache_dir = ".pytest_cache"
+
+# List of plugins to load
+plugins = ["pytest-cov"]
+
+# List of files or directories to ignore during testing
+norecursedirs = ["venv"]
+
+# List of markers to exclude from test discovery
+markers = ["not_ready: mark tests that are not yet ready to be run"]
+
+[tool.pytest.ini_options]
+pythonpath = ["codegpt"]
+testpaths = ["tests"]
+
