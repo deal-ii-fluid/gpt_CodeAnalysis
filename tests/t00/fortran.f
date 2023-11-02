@@ -1,4 +1,7 @@
+! this is example of SUB1
+c this is the c
       SUBROUTINE SUB1
+c this is the p
       PRINT *, 'Subroutine 1'
       END SUBROUTINE SUB1
 

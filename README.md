@@ -79,3 +79,10 @@ codegpt quick ugh <filenames>
 Keep in mind that using GPT-3 for code generation is paid, with a cost of 2 cents per 1,000 tokens.
 
 Just like with a Jr Dev, it's best to break up your tasks into smaller pieces to improve the results.
+
+
+
+## makrdown文档可视化
+- (use kramdown-asciidoc to transfer md to asciidoc format)[https://github.com/asciidoctor/kramdown-asciidoc]
+- asciidoxy  -r asciidoctor-diagram addshell.adoc 
+

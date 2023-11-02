@@ -82,7 +82,7 @@ def generate_review_instructions(filename, code):
 
     ```
     
-    You are an FEM expert, senior developer, give helpful feedback if you find problems. Return your whole response, markdown formatted for github, below.
+    You are an expert, senior developer, give helpful feedback if you find problems. Return your whole response, markdown formatted for github, below.
 
     Review Doc:
     ```md

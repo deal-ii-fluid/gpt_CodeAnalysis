@@ -61,19 +61,33 @@ class CodeParser:
     def parse_and_extract_functions(self, source_code):
         raise NotImplementedError()
 
+
+
 class PythonCodeParser(CodeParser):
-    def parse_and_extract_functions(self, source_code):
-        # 第一次解析：移除注释
+    def parse_and_extract_functions(self, source_code, keep_comments=True):
+        # 使用AST解析源代码
         tree = ast.parse(source_code)
-        new_body = [node for node in tree.body if not (isinstance(node, ast.Expr) and isinstance(node.value, ast.Str))]
-        tree.body = new_body
-        cleaned_code = astunparse.unparse(tree)
-
-        # 第二次解析：在清理过的代码上提取函数
-        tree_clean = ast.parse(cleaned_code)
-        functions = [(node.name, node.lineno, max((child.lineno for child in ast.walk(node) if hasattr(child, 'lineno')), default=node.lineno)) for node in tree_clean.body if isinstance(node, (ast.FunctionDef))]
-
+        
+        # 如果不保留注释，则从代码中移除它们
+        if not keep_comments:
+            new_body = [node for node in tree.body if not (isinstance(node, ast.Expr) and isinstance(node.value, ast.Str))]
+            tree.body = new_body
+            cleaned_code = astunparse.unparse(tree)
+            tree = ast.parse(cleaned_code)
+        else:
+            cleaned_code = source_code
+        
+        # 提取函数定义
+        functions = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                name = node.name
+                start_line = node.lineno
+                end_line = max((child.lineno for child in ast.walk(node) if hasattr(child, 'lineno')), default=start_line)
+                functions.append((name, start_line, end_line))
+        
         return cleaned_code, functions
+
 
 
 class FortranCodeParser(CodeParser):
