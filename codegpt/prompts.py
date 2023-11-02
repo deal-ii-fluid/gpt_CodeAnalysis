@@ -30,6 +30,9 @@ def set_username(username):
 }
 
 
+
+
+
 def generate_review_instructions(filename, code):
     instructions = dedent(
         f"""
@@ -42,11 +45,12 @@ def generate_review_instructions(filename, code):
     In your markdown file, please include the following information:
     
     1. A summary of the purpose of the file and its contents.
-    2. A list of all classes and functions defined in the file, along with a brief description of their purpose.
-    3. A list of any external dependencies used in the file, including any libraries or modules imported from outside the project.
-    4. Any bugs or issues you identified while reviewing the code.
+    2. A list of core parameters defined in the file, along with a brief description of their purpose.
+    3. An overview of the algorithm, outlining key strategies and methods used.
+    4. A UML activity diagram using PlantUML syntax, delineating the code's workflow and structure.
     5. Any areas of the code that you consider to be particularly well-written or poorly-written, and why.
-    
+ 
+
     Please also include any questions or comments you have about the code in your markdown file.
     
     When you have finished reviewing the code and documenting your findings, please submit your markdown file for review.
@@ -60,31 +64,54 @@ def generate_review_instructions(filename, code):
     
     [Insert summary of the purpose of the file and its contents here.]
     
-    ## Classes and Functions
+    ## Parameters
     
-    [Insert a list of all classes and functions defined in the file, along with a brief description of their purpose.]
+    [Insert list of Parameter name, its type,specific purpose and any particular details of this parameter]
+   
+    ## Algorithm Implementation
     
-    ## External Dependencies
+    [Insert an overview of the algorithm, key strategies and methods used.]
     
-    [Insert a list of any external dependencies used in the file, including any libraries or modules imported from outside the project.]
-    
-    ## Bugs and Issues
-    
-    [Insert any bugs or issues you identified while reviewing the code.]
-    
+    ## UML Diagram    
+
+    [Insert a UML activity diagram using PlantUML syntax, delineating the code's workflow and structure. ]
+
     ## Code Quality
     
     [Insert any comments you have on the quality of the code, including any areas that you consider to be particularly well-written or poorly-written, and why.]
-    
-    ## Questions and Comments
-    
-    [Insert any questions or comments you have about the code.]
+
     ```
     
-    You are an expert, senior developer, give helpful feedback if you find problems. Return your whole response, markdown formatted for github, below.
+    You are an FEM expert, senior developer, give helpful feedback if you find problems. Return your whole response, markdown formatted for github, below.
 
     Review Doc:
     ```md
     """
     )
     return instructions
+
+
+# 暂时这个方案，会逐渐累计错误！弃用
+def generate_codemissing_instructions(filename, code, report):
+    instructions = dedent(
+        f"""
+    We have reviewed the first part of the code in the file "{filename}" and have generated the following code review in markdown form:
+    
+    ```
+    {report}
+    ```
+    However, due to token limits, we had to separate the full code into several parts. You need to continue to supplement the previous markdown report. Be as concise as possible. I will continue to provide the adjacent, truncated code:    
+    ```
+    {code}
+    ```
+    
+    """
+    )
+    return instructions
+
+
+
+
+
+
+

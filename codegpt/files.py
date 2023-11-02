@@ -74,13 +74,16 @@ class PythonCodeParser(CodeParser):
         return cleaned_code, functions
 
 class FortranCodeParser(CodeParser):
-    def parse_and_extract_functions(self, source_code):
+    def parse_and_extract_functions(self, source_code, keep_comments=False):
         # 解析并移除注释
         parser = ParserFactory().create(std="f2003")
         reader = FortranStringReader(source_code)
         parse_tree = parser(reader)
-        new_content = [item for item in parse_tree.content if not isinstance(item, fparser.two.Fortran2003.Comment)]
-        parse_tree.content = new_content
+
+        if not keep_comments:
+            new_content = [item for item in parse_tree.content if not isinstance(item, fparser.two.Fortran2003.Comment)]
+            parse_tree.content = new_content
+            
         cleaned_code = parse_tree.tofortran()
 
         # 在清理过的代码上提取函数
@@ -101,6 +104,18 @@ class FortranCodeParser(CodeParser):
 
         return cleaned_code, functions
 
+
+class MarkdownCodeParser(CodeParser):
+    def parse_and_extract_functions(self, source_code):
+        raw_code = source_code
+        start_line = 1
+        end_line = len(source_code.splitlines())
+        functions = [("Full Document", start_line, end_line)]
+        return raw_code, functions
+
+
+
+
 def process_file(file_path):
     _, file_extension = os.path.splitext(file_path)
     file_extension = file_extension.lower()
@@ -109,6 +124,7 @@ def process_file(file_path):
         '.py': PythonCodeParser(),
         '.f': FortranCodeParser(),
         '.F': FortranCodeParser(),
+        '.md': MarkdownCodeParser(),
     }
 
     parser = parsers.get(file_extension)

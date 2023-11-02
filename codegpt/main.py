@@ -3,7 +3,6 @@ import typer
 import json
 import logging
 import concurrent.futures
-
 import sys
 
 sys.path.append("../codegpt")
@@ -17,6 +16,8 @@ from typing import List, Optional
 from pathlib import Path
 
 from rich.progress import track
+
+
 
 
 app = typer.Typer(
@@ -168,32 +169,56 @@ def quick_edit_file(
     files.write_text(result, backup)
     typer.secho("Done!", color=typer.colors.BRIGHT_BLUE)
 
-
-
 def process_docs_file(filename, chunk, docs_directory="docs", retry=5):
     try:
-        prompt = prompts.generate_review_instructions(filename, chunk)
-        typer.secho(f"Processing {filename}.md ...",fg="blue")
-        result = gpt.send_normal_completion(prompt, 15000, True)
+        start = 0
+        chunk_left = chunk
+        result = None
+        while chunk_left and retry:
+            try:
+                typer.secho(f"Starting process with chunk size: {len(chunk_left)}", fg="yellow")  # Log the start and chunk size
+                prompt = prompts.generate_review_instructions(filename, chunk_left)
+                result = gpt.send_normal_completion(prompt, 15000, True)
+            except Exception as e:
+                if "reduce the length of the messages" in str(e):
+                    typer.secho(f"Too long, reducing chunk size in",fg="red")  # Log the reduction
+                    chunk_left = chunk_left[:int(len(chunk_left) * 0.75)]  # decrease the chunk size
+                    retry -= 1  # decrease retries
+                else:
+                    return str(e)  # return the exception message if it's not the known type
+            else:
+                break  # break the loop if no exception occurred
+        start = len(chunk_left)
+        chunk_left = chunk[start:]
 
-        # Write the documentation for the current code chunk to a file
-        outname = f"./docs/{filename}.md"
-        # Create the '/docs' folder and any intermediate directories if they do not exist
-        Path(outname).parent.mkdir(parents=True, exist_ok=True)
 
-        files.write_text([{"filename": outname, "code": result}])
-
-        # Print a message to confirm that the documentation has been written to the file
-        typer.secho(f"Wrote documentation for {filename} to {outname}", color=typer.colors.GREEN)
-
+# 暂时弃用
+#        while chunk_left and retry:  # 暂时弃用该方案，会累计误差，导致分析失真
+#            try:
+#                typer.secho(f"Processing remaining chunk with size: {len(chunk_left)}",fg="yellow")  # Log the start of remaining chunk processing
+#                prompt_x = prompts.generate_codemissing_instructions(filename, chunk_left, result)
+#                result = gpt.send_normal_completion(prompt_x, 15000, True)
+#            except Exception as e:
+#                if "reduce the length of the messages" in str(e):
+#                    typer.secho(f"Too long, reducing chunk size in chunk_left",fg="red")  # Log the reduction
+#                    chunk_left = chunk_left[:int(len(chunk_left) * 0.75)]  # decrease the chunk size and continue the process
+#                    retry -= 1
+#                else:
+#                    return str(e)  # return the exception message if it's not the known type
+#            else:
+#                start = len(chunk_left)
+#                chunk_left = chunk[start:]  # update the remaining part of the chunk
+#      
     except Exception as e:
-        typer.secho(f"e: {str(e)}")
-        if "当前分组上游负载已饱和" in str(e) and retry > 0:
-            chunk = chunk[:int(len(chunk) * 0.75)]  # decrease the chunk size
-            process_docs_file(filename, chunk, docs_directory, retry-1)
-        else:
-            tb.print_exc()
-            typer.secho(f"Error processing file {filename} : {e}", color=typer.colors.RED)
+            return str(e)  # return the exception message if it's not the known type
+    
+    # Write the documentation for the current code chunk to a file
+    outname = f"./docs/{filename}.md"
+    Path(outname).parent.mkdir(parents=True, exist_ok=True)
+    files.write_text([{"filename": outname, "code": result}])
+    typer.secho(f"Wrote documentation for {filename} to {outname}", fg="green")
+
+
 
 
 
