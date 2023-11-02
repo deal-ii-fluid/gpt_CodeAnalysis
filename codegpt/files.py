@@ -15,6 +15,8 @@ from fparser.common.readfortran import FortranStringReader
 
 
 
+
+
 def load_text(filenames):
     out = {}
     for filename in filenames:
@@ -73,36 +75,29 @@ class PythonCodeParser(CodeParser):
 
         return cleaned_code, functions
 
+
 class FortranCodeParser(CodeParser):
-    def parse_and_extract_functions(self, source_code, keep_comments=False):
-        # 解析并移除注释
-        parser = ParserFactory().create(std="f2003")
-        reader = FortranStringReader(source_code)
-        parse_tree = parser(reader)
+    def parse_and_extract_functions(self, source_code, keep_comments=True):
+        parser = ParserFactory().create(std="f2003") 
 
-        if not keep_comments:
-            new_content = [item for item in parse_tree.content if not isinstance(item, fparser.two.Fortran2003.Comment)]
-            parse_tree.content = new_content
-            
-        cleaned_code = parse_tree.tofortran()
-
-        # 在清理过的代码上提取函数
-        reader_clean = FortranStringReader(cleaned_code)
-        parse_tree_clean = parser(reader_clean)
+        if keep_comments:
+            reader = FortranStringReader(source_code, ignore_comments=False)
+            parse_tree = parser(reader)
+        else:
+            reader = FortranStringReader(source_code)
+            parse_tree = parser(reader)
+        
+        code = parse_tree.tofortran()
         functions = []
-        for item in parse_tree_clean.content:
-            if isinstance(item, fparser.two.Fortran2003.Subroutine_Subprogram):
-                name = str(item.content[0].items[1])
-                start_line = item.content[0].item.span[0]
-                end_line = item.content[-1].item.span[1]
-                functions.append((name, start_line, end_line))
-            elif isinstance(item, fparser.two.Fortran2003.Function_Subprogram):
+
+        for item in parse_tree.content:
+            if isinstance(item, fparser.two.Fortran2003.Subroutine_Subprogram) or isinstance(item, fparser.two.Fortran2003.Function_Subprogram):
                 name = str(item.content[0].items[1])
                 start_line = item.content[0].item.span[0]
                 end_line = item.content[-1].item.span[1]
                 functions.append((name, start_line, end_line))
 
-        return cleaned_code, functions
+        return code, functions
 
 
 class MarkdownCodeParser(CodeParser):

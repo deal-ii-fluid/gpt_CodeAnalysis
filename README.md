@@ -4,9 +4,6 @@
 
 A tool for using GPT just a little quicker. A nearly truly automated footgun. Learn how to revert with git before trying please.
 
-Posting about progress here:
-
-[![Twitter Follow](https://img.shields.io/twitter/follow/_JohnPartee?style=social)](https://twitter.com/_JohnPartee)
 
 [More GPT Notes here](https://github.com/morganpartee/gpt3-resources)
 
@@ -17,11 +14,6 @@ Posting about progress here:
 And set your openapi API key as an environment variable like they recommend:
 [In their docs here](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety)
 
-Windows users can also use `setx` like:
-
-`$ setx OPENAI_SECRET_KEY=<YOUR_API_KEY>`
-
-from an admin console.
 
 ## Your first (safe) command
 
